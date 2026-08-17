@@ -173,6 +173,18 @@ from typing import Any, Callable
 from urllib.parse import parse_qsl, urlencode, urljoin, urlparse
 
 
+def _launch_browser(playwright):
+    """Launch Playwright Chromium with system executable fallback for Linux/Streamlit Cloud."""
+    import shutil
+    executable = shutil.which("chromium") or shutil.which("chromium-browser")
+    if executable:
+        try:
+            return playwright.chromium.launch(headless=True, executable_path=executable)
+        except Exception:
+            pass
+    return playwright.chromium.launch(headless=True)
+
+
 class WebsiteInspector:
     """Inspect publicly accessible websites using Playwright."""
 
@@ -241,7 +253,7 @@ class WebsiteInspector:
         sitemap_nodes: list[dict[str, Any]] = []
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = _launch_browser(playwright)
             context = browser.new_context(
                 viewport={"width": 1280, "height": 800},
                 user_agent=(

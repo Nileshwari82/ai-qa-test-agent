@@ -66,7 +66,15 @@ def _run_checks_internal(
     selectors_to_check = selectors_to_check[:max_checks]
 
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
+        import shutil
+        executable = shutil.which("chromium") or shutil.which("chromium-browser")
+        if executable:
+            try:
+                browser = playwright.chromium.launch(headless=True, executable_path=executable)
+            except Exception:
+                browser = playwright.chromium.launch(headless=True)
+        else:
+            browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
         try:
             page.goto(analysis.url, wait_until="domcontentloaded", timeout=30000)
