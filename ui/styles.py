@@ -22,13 +22,43 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; }
 .metric-label { font-size: 0.8rem; opacity: 0.85; margin-top: 0.25rem; }
-.agent-step {
-    padding: 0.6rem 0.9rem; border-radius: 8px; margin-bottom: 0.4rem;
-    border-left: 4px solid #e2e8f0; background: #f8fafc; font-size: 0.9rem;
+.agent-step-card {
+    padding: 0.85rem 1.1rem;
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #f8fafc;
+    transition: all 0.2s ease;
 }
-.agent-done { border-left-color: #22c55e; background: #f0fdf4; }
-.agent-running { border-left-color: #3b82f6; background: #eff6ff; }
-.agent-pending { border-left-color: #cbd5e1; color: #94a3b8; }
+.step-card-done {
+    border-left: 6px solid #22c55e !important;
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+.step-card-running {
+    border-left: 6px solid #38bdf8 !important;
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+}
+.step-card-pending {
+    border-left: 6px solid #64748b !important;
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    opacity: 0.75;
+}
+.agent-badge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.badge-done { background: #166534 !important; color: #4ade80 !important; }
+.badge-running { background: #075985 !important; color: #38bdf8 !important; }
+.badge-pending { background: #334155 !important; color: #94a3b8 !important; }
 .status-badge {
     display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px;
     font-size: 0.75rem; font-weight: 600;

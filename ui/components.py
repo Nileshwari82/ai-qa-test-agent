@@ -29,19 +29,39 @@ def render_agent_activity(steps: dict[str, str], show: bool = True) -> None:
         return
     st.markdown("#### 🤖 AI QA Agent Multi-Step Architecture")
     icons = {
-        "website": "Agent 1 — Website Discovery Agent",
-        "page_analysis": "Agent 2 — Page Analysis Agent",
-        "functionality": "Agent 3 — Functionality Detection Agent",
-        "scenario": "Agent 4 — Test Scenario Agent",
-        "testcase": "Agent 5 — Test Case Generator Agent",
-        "validator": "Agent 6 — QA Validator Agent",
-        "report": "Agent 7 — Report Agent",
+        "website": ("Agent 1 — Website Discovery Agent", "Discovers internal pages, normalizes URLs & creates visual sitemap"),
+        "page_analysis": ("Agent 2 — Page Analysis Agent", "Full-page progressive scroll, DOM extraction & screenshot capture"),
+        "functionality": ("Agent 3 — Functionality Detection Agent", "Groups page elements into logical user functionalities"),
+        "scenario": ("Agent 4 — Test Scenario Agent", "Generates comprehensive test scenarios per functionality"),
+        "testcase": ("Agent 5 — Test Case Generator Agent", "Generates detailed test cases with intelligent page allocation"),
+        "validator": ("Agent 6 — QA Validator Agent", "Validates test coverage, duplicate IDs, and edge cases"),
+        "report": ("Agent 7 — Report Agent", "Formats executive summary and page-by-page QA report"),
     }
-    for key, label in icons.items():
+
+    for key, (label, desc) in icons.items():
         status = steps.get(key, "pending")
-        css = {"done": "agent-done", "running": "agent-running"}.get(status, "agent-pending")
-        icon = {"done": "✓", "running": "⟳"}.get(status, "○")
-        st.markdown(f'<div class="agent-step {css}">{icon} {label}</div>', unsafe_allow_html=True)
+        if status == "done":
+            badge = '<span class="agent-badge badge-done">✓ COMPLETED</span>'
+            css = "step-card-done"
+        elif status == "running":
+            badge = '<span class="agent-badge badge-running">⟳ IN PROGRESS</span>'
+            css = "step-card-running"
+        else:
+            badge = '<span class="agent-badge badge-pending">○ PENDING</span>'
+            css = "step-card-pending"
+
+        st.markdown(
+            f"""
+            <div class="agent-step-card {css}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="font-size:15px; letter-spacing:0.3px;">{label}</strong>
+                    {badge}
+                </div>
+                <div style="font-size:12px; opacity:0.85; margin-top:4px;">{desc}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 def render_export_buttons(report: QAReport) -> None:
