@@ -58,12 +58,14 @@ def init_state() -> None:
             st.session_state[key] = val
 
 
-@st.cache_resource
 def ensure_playwright_browsers() -> None:
-    """Ensure Playwright Chromium is installed on cloud platforms (e.g. Streamlit Cloud)."""
+    """Safely check if Playwright Chromium is installed without blocking startup."""
+    import shutil
+    if shutil.which("chromium") or shutil.which("chromium-browser"):
+        return
     try:
         import subprocess
-        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=False, timeout=30)
     except Exception as exc:
         logging.warning("Playwright browser installation check failed: %s", exc)
 
@@ -76,7 +78,6 @@ def main() -> None:
         initial_sidebar_state="expanded",
     )
     init_state()
-    ensure_playwright_browsers()
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
     with st.sidebar:

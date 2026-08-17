@@ -65,16 +65,32 @@ def _run_checks_internal(
 
     selectors_to_check = selectors_to_check[:max_checks]
 
+    chrome_args = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+    ]
     with sync_playwright() as playwright:
         import shutil
         executable = shutil.which("chromium") or shutil.which("chromium-browser")
+        browser = None
         if executable:
             try:
-                browser = playwright.chromium.launch(headless=True, executable_path=executable)
-            except Exception:
-                browser = playwright.chromium.launch(headless=True)
-        else:
-            browser = playwright.chromium.launch(headless=True)
+                browser = playwright.chromium.launch(headless=True, executable_path=executable, args=chrome_args)
+            except Exception as exc:
+                logger.warning("Failed launching system chromium in browser_checks: %s", exc)
+        if not browser:
+            try:
+                browser = playwright.chromium.launch(headless=True, args=chrome_args)
+            except Exception as exc:
+                return [
+                    BrowserCheckResult(
+                        test="Playwright launch",
+                        result="SKIP",
+                        evidence=f"Browser check skipped: {exc}",
+                    )
+                ]
         page = browser.new_page()
         try:
             page.goto(analysis.url, wait_until="domcontentloaded", timeout=30000)

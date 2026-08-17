@@ -176,13 +176,29 @@ from urllib.parse import parse_qsl, urlencode, urljoin, urlparse
 def _launch_browser(playwright):
     """Launch Playwright Chromium with system executable fallback for Linux/Streamlit Cloud."""
     import shutil
+    chrome_args = [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+    ]
     executable = shutil.which("chromium") or shutil.which("chromium-browser")
     if executable:
         try:
-            return playwright.chromium.launch(headless=True, executable_path=executable)
-        except Exception:
-            pass
-    return playwright.chromium.launch(headless=True)
+            return playwright.chromium.launch(headless=True, executable_path=executable, args=chrome_args)
+        except Exception as exc:
+            logger.warning("Failed launching system chromium executable at %s: %s", executable, exc)
+    try:
+        return playwright.chromium.launch(headless=True, args=chrome_args)
+    except Exception as exc:
+        try:
+            from app import ensure_playwright_browsers
+            ensure_playwright_browsers()
+            return playwright.chromium.launch(headless=True, args=chrome_args)
+        except Exception as inner_exc:
+            logger.error("Failed launching Playwright Chromium: %s", inner_exc)
+            raise exc
+
 
 
 class WebsiteInspector:
